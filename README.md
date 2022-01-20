@@ -2,6 +2,25 @@
 
 ## Intro
 
+* Meet Deno
+
+Deno is a typescript/javascript runtime that strives for browser and standards compatbility
+
+* In the box
+
+Dev Tools, like Debuging, Formatting, Linting, Type checking, Testing, Document Generation, Bundling, and Compiling are built into Deno!
+
+* Deploy on the Edge, https://deno.com is an edge distribution service that distributes your application as close to the user as possible around the world.
+
+## Learn by doing
+
+💪 Lets learn more by doing, we will create a simple URL shortner application using Deno and deploy using Deno Deploy - 🦕
+
+## Requirements
+
+* Deno - https://deno.land/#installation
+
+
 ## Setup
 
 > If you have not already, create an account using https://dashboard.hyper.io
