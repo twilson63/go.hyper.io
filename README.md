@@ -276,3 +276,11 @@ POST {url}/graphql
 ```
 
 
+## Thank you
+
+Thank you for taking the time to work through this workshop! I hope you found it educational and fun at the same time! 🎉
+
+Thank you to the Deno community and the Deno team for building and supporting this technology! 🙏🏻
+
+
+
