@@ -38,7 +38,7 @@ run:
 	@deno run --allow-env --allow-read --allow-net --import-map import_map.json ./mod.ts
 
 bundle:
-	@deno bundle --import-map import_map.json ./mod.ts bundle.ts
+	@deno bundle --import-map import_map.json ./mod.ts bundle.js
 ```
 
 ## Creating a Server
@@ -225,3 +225,35 @@ ports:
   "deno.importMap": "./import_map.json"
 }
 ```
+
+## Deno Deploy
+
+Login to deno.com and create a new project, select you repository and the `bundle.js` file and click `deploy`
+
+> Try it out with https://hoppscotch.io
+
+
+Query Shortcut
+
+POST {url}/graphql
+
+```json
+{
+  "query": "query { shortcut(code: \"1234\") { href }}"
+}
+
+```
+
+--- 
+
+Create Shortcut
+
+POST {url}/graphql
+
+```json
+{
+  "query": "mutation { createShortcut(code: \"fb\", href: \"https://facebook.com\") { ok }}"
+}
+```
+
+
