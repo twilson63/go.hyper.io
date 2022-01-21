@@ -2,24 +2,28 @@
 
 ## Intro
 
-* Meet Deno
+- Meet Deno
 
-Deno is a typescript/javascript runtime that strives for browser and standards compatbility
+Deno is a typescript/javascript runtime that strives for browser and standards
+compatbility
 
-* In the box
+- In the box
 
-Dev Tools, like Debuging, Formatting, Linting, Type checking, Testing, Document Generation, Bundling, and Compiling are built into Deno!
+Dev Tools, like Debuging, Formatting, Linting, Type checking, Testing, Document
+Generation, Bundling, and Compiling are built into Deno!
 
-* Deploy on the Edge, https://deno.com is an edge distribution service that distributes your application as close to the user as possible around the world.
+- Deploy on the Edge, https://deno.com is an edge distribution service that
+  distributes your application as close to the user as possible around the
+  world.
 
 ## Learn by doing
 
-💪 Lets learn more by doing, we will create a simple URL shortner application using Deno and deploy using Deno Deploy - 🦕
+💪 Lets learn more by doing, we will create a simple URL shortner application
+using Deno and deploy using Deno Deploy - 🦕
 
 ## Requirements
 
-* Deno - https://deno.land/#installation
-
+- Deno - https://deno.land/#installation
 
 ## Setup
 
@@ -47,6 +51,12 @@ create `import_map.json` to add our dependencies
 }
 ```
 
+> import maps is an up and coming standard for js clients to control the
+> behavior or imports, Deno has implemented the standard into their cli. To
+> learn more about import maps read the following draft proposal
+> https://wicg.github.io/import-maps/ and check out the Deno manual
+> https://deno.land/manual/linking_to_external_code/import_maps
+
 create a `Makefile` for our commands
 
 ```make
@@ -58,7 +68,14 @@ run:
 
 bundle:
 	@deno bundle --import-map import_map.json ./mod.ts bundle.js
+
+install:
+	@deno cache --lock mod_lock.json --lock-write --import-map import_map.json mod.ts
 ```
+
+> Makefiles are like npm scripts, it allows you to quickly create simple script
+> commands and invoke them by calling: `make` or `make bundle` - for more
+> information check out https://odino.org/makefile-101/
 
 ## Creating a Server
 
@@ -67,6 +84,14 @@ import { serve } from "server";
 
 serve((_req: Request): Response => new Response("Hello World"));
 ```
+
+> mod.ts is the commonly used name for the entry point of a Deno application,
+> but you do not have to use this convention if you prefer another entry point
+> name. The serve method takes a handler function as input and the handler
+> function takes a Request argument parameter and expects a Response or
+> Promise<Response> in return. Both Request and Response are documented on MDN
+> https://developer.mozilla.org/en-US/docs/Web/API/Request and
+> https://developer.mozilla.org/en-US/docs/Web/API/Response
 
 ## Create graphql API
 
@@ -115,25 +140,26 @@ interface Result {
 
 const resolvers = {
   Query: {
-    shortcut: async (_parent: unknown, { code }: Input): Promise<Shortcut> =>
+    shortcut: async (_parent: unknown, { code }: Input) =>
       await hyper.data.get(code) as Shortcut,
   },
   Mutation: {
-    createShortcut(
-      _parent: unknown,
-      { code, href }: Shortcut,
-    ): Promise<Result> {
+    createShortcut(_parent: unknown, { code, href }: Shortcut) {
       return hyper.data.add({ _id: code, code, href });
     },
   },
 };
 
-export const graphql = (req: Request): Response =>
-  GraphQLHTTP({
+export const graphql = async (req: Request) =>
+  await GraphQLHTTP({
     schema: makeExecutableSchema({ resolvers, typeDefs }),
     graphiql: true,
-  });
+  })(req);
 ```
+
+> The gql module provides a `GraphQLHTTP` method that takes an object with an
+> executable schema, which includes resolvers and typeDefs and an option to show
+> the graphiql ux, then returns a function matching the http handler criteria.
 
 update `mod.ts` to import `api.ts`
 
@@ -143,6 +169,10 @@ import { graphql } from "./api.ts";
 
 serve(graphql);
 ```
+
+> We can run our graphql endpoint by importing graphql from the api module and
+> adding it as an argument to our serve function. If you now run `make` you
+> should spin up a graphql server.
 
 ## Routing
 
@@ -171,12 +201,17 @@ serve((req: Request): Response => {
 });
 ```
 
+> Using `URLPattern` we can setup our routes and use the test function to check
+> if the incoming url matches the route we need for our handlers. This may not
+> look as pretty as `express` but it built in to Deno and `URLPattern` is a
+> standard web API - https://developer.mozilla.org/en-US/docs/Web/API/URLPattern
+
 ## Look up the code and redirect
 
 Lets add the lookup function in `api.ts`
 
 ```ts
-export const shortcut = async (code: string): Promise<string> => {
+export const shortcut = async (code: string) => {
   let result = await hyper.data.get<Shortcut>(code) as Shortcut;
   return result.href;
 };
@@ -202,7 +237,16 @@ if (GOTO.exec(req.url)) {
 ...
 ```
 
+> 🎉 Congrats! You have setup a simple URL Shortcut app!
+>
+> Hopefully, you can see the power of Deno and how leveraging Web APIs as a part
+> of a server runtime can reduce complexity without adding to much manual code!
+> If you do need a framework, you should check out https://nanojsx.io/
+
 ## Gitpod Setup
+
+> This section covers the files you will need to setup, if you plan to use
+> gitpod, you can also fork this repo as well.
 
 `.gitpod.Dockerfile`
 
@@ -247,10 +291,10 @@ ports:
 
 ## Deno Deploy
 
-Login to deno.com and create a new project, select you repository and the `bundle.js` file and click `deploy`
+Login to deno.com and create a new project, select you repository and the
+`bundle.js` file and click `deploy`
 
 > Try it out with https://hoppscotch.io
-
 
 Query Shortcut
 
@@ -260,10 +304,9 @@ POST {url}/graphql
 {
   "query": "query { shortcut(code: \"1234\") { href }}"
 }
-
 ```
 
---- 
+---
 
 Create Shortcut
 
@@ -275,12 +318,10 @@ POST {url}/graphql
 }
 ```
 
-
 ## Thank you
 
-Thank you for taking the time to work through this workshop! I hope you found it educational and fun at the same time! 🎉
+Thank you for taking the time to work through this workshop! I hope you found it
+educational and fun at the same time! 🎉
 
-Thank you to the Deno community and the Deno team for building and supporting this technology! 🙏🏻
-
-
-
+Thank you to the Deno community and the Deno team for building and supporting
+this technology! 🙏🏻
